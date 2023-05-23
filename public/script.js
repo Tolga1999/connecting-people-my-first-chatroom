@@ -20,11 +20,27 @@ form.addEventListener('submit', (event) => {
     }
 })
 
-
 // toevoegen van emit aan de pagina
-client.on('message', (message) => {
+client.on('message', (data) => {
     let item = document.createElement('li');
-    item.textContent = message;
+    item.textContent = data.clientName + " " + data.message;
     messages.appendChild(item);
+    window.scrollTo(0, document.body.scrollHeight);
+})
+
+// prompt, vraagt naam van user (value later te gebruiken)
+const clientName = prompt("Wat is jouw naam?")
+
+// toevoegen van joined wanneer user connected is
+let joined = document.createElement('li');
+joined.textContent = "You joined"
+messages.appendChild(joined)
+
+client.emit('new-user', clientName)
+
+client.on('user-connected', (clientName) => {
+    let itemConnected = document.createElement('li');
+    itemConnected.textContent = clientName + ' connected';
+    messages.appendChild(itemConnected);
     window.scrollTo(0, document.body.scrollHeight);
 })
