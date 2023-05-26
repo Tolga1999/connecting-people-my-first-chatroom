@@ -12,37 +12,36 @@ const ioServer = new Server(server)
 // Serveer client-side bestanden
 app.use(express.static(path.resolve('public')))
 
-// alle users
-const clientNames = {}
+// user const
+const names = {}
 
 // connecten event voor user (connection event)
-ioServer.on('connection', (client) => {
+ioServer.on('connection', (socket) => {
 
     console.log('a user connected');
 
     // disconnect event voor user
-    client.on('disconnect', () => {
+    socket.on('disconnect', () => {
         console.log('user disconnected')
     })
 
     // user joined
-    client.on('new-user', (clientName) => {
-        // elke unieke user krijgt een naam
-        clientNames[ioServer.id] = clientName
-        // user connected, wordt geemit naar clients
-        ioServer.emit('user-connected', clientName)
+    socket.on('new-user', (clientName) => {
+
+        // client naam toevoegen aan names object, met als key de id van de socket (zo maak je unieke data voor namen)
+        names[socket.client.id] = clientName
+
+        socket.broadcast.emit('user-connected', clientName)
 
     })
 
     // broadcasting van message naar andere clients
-    client.on('message', (message) => {
-        // console log van message vanuit client side js
-        console.log('message ' + message)
+    socket.on('message', (message) => {
 
-        // server stuurt de message nu naar de andere clients
+        // server stuurt de message nu naar de andere sockets
         ioServer.emit('message', {
             message: message,
-            clientName: clientName[ioServer.id]
+            name: names[socket.client.id]
         })
     })
 });
