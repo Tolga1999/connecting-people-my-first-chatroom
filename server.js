@@ -8,6 +8,7 @@ import http from "http"
 const app = express()
 const server = http.createServer(app)
 const ioServer = new Server(server)
+const port = process.env.PORT || 8000
 
 // Serveer client-side bestanden
 app.use(express.static(path.resolve('public')))
@@ -47,6 +48,6 @@ ioServer.on('connection', (socket) => {
 });
 
 // listens to port
-server.listen(8000, () => {
-    console.log('listening on http://localhost:8000');
+server.listen(port, () => {
+    console.log('listening on http://localhost:' + port);
 });
